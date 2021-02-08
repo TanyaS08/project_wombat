@@ -3,7 +3,11 @@ import Pkg
 Pkg.activate("code")
 
 ## We then load the packages
-using EcologicalNetworks
+using SpatialEcology
+using LinearAlgebra
+using CSV, DataFrames
+using Statistics
+
 
 ## Import the functions and methods we need
 include(joinpath(pwd(), "code", "lib", "main.jl"))
@@ -14,6 +18,10 @@ NOTE refer back to Fortin & Dale (2005) and Barbujani (1989) when you
      inevitibly get stuck
 
 =#
+
+amphdata = CSV.read(joinpath(dirname(pathof(SpatialEcology)), "..", "data", "amph_Europe.csv"));
+
+
 
 ## STEP 1: Create the network surface
 
@@ -108,6 +116,12 @@ well as an actual measure of the community
     - Second order derivative (identify inflection point i.e. where boundary ends)
         i.e. locating boundaries within boundaries so
         Candidate boundaries = (𝑚 - 2)(𝑛 - 2)
+
+        BUT see also Pilibert 2008 - they talk a bout a bit of a different
+        approach
+
+        NOTE think about the idea of ding this across 'scales' i.e. different
+        thresholds
 =#
 
 ## STEP 6: Signif of candidiate boundaries
@@ -167,6 +181,10 @@ well as an actual measure of the community
 
     ∂𝑓(𝑋,𝑌)/∂𝑌 = 𝑎𝑥 + 𝑐
 
+    and the centroid is:
+
+    [(𝑥₁ + 𝑥₂ + 𝑥₃)/3], [(𝑦₁ + 𝑦₂ + 𝑦₃)/3]
+
     and the 'orientation'/gradient is still
 
     θ = tan⁻¹[(∂𝑓/∂𝑥)/(∂𝑓/∂𝑦)] + Δ
@@ -184,4 +202,4 @@ well as an actual measure of the community
 
 ## STEP ?: Could we quantify 'multivariate' gradients... i.e. repeating
 # the process for multiple properties of our networks and somehow
-# comparing and contrasting
+# comparing and contrasting THAT WOULD BE AVERAGING FOR MULTIPLE SURFACES??
