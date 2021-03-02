@@ -7,10 +7,17 @@ using SpatialEcology
 using LinearAlgebra
 using CSV, DataFrames
 using Statistics
+using SimpleSDMLayers
+using GBIF
+using StatsPlots
+using VoronoiDelaunay
+using ArchGDAL
+#using NeutralLandscapes
+using Delaunay
 
 
 ## Import the functions and methods we need
-include(joinpath(pwd(), "code", "lib", "main.jl"))
+include(joinpath(pwd(), "code", "lib", "main.jl"));
 
 #=
 
@@ -19,9 +26,16 @@ NOTE refer back to Fortin & Dale (2005) and Barbujani (1989) when you
 
 =#
 
+
+#some toy datasets
+#Lattice
 amphdata = CSV.read(joinpath(dirname(pathof(SpatialEcology)), "..", "data", "amph_Europe.csv"));
 
-
+#'Random'
+kingfisher = GBIF.taxon("Megaceryle alcyon", strict=true);
+kf_occurrences = GBIF.occurrences(kingfisher, "hasCoordinate" => "true");
+kf_df = DataFrame(kf_occurrences);
+kf_data = kf_df[:, [:latitude, :longitude]];
 
 ## STEP 1: Create the network surface
 

@@ -10,7 +10,9 @@
 abstract type GridStructure end; #New Parent type defining relationship between co-ords
 
 abstract type Regular <: GridStructure end; #'Perfect' grid
-abstract type Random <: GridStructure end; #Points random
+abstract type Random <: GridStructure end; #Points 'random'
+
+const AG = ArchGDAL
 
 #1 test layout of co-ords to see how they are arranged
 
@@ -25,6 +27,35 @@ abstract type Random <: GridStructure end; #Points random
 ## STEP 2: Connecting the networks in space
 
 # TODO how to Delaunay Triangulate
+
+#sort sites into buckets
+#sort along 1 axis and if equal then by the Second
+sort(amphdata.Lat, by=sort(amphdata.Long))
+
+amph_coord = convert(Matrix, amphdata[1:10, [:Lat, :Long]]);
+
+mesh = delaunay(amph_coord);
+
+mesh.neighbors
+mesh.points
+mesh.simplices
+
+C = [amph_coord[i,1] for i in mesh.simplices];
+D = [amph_coord[i,2] for i in mesh.simplices];
+#amphdata[1:10, :Salamandra_salamandra]
+#Z = [amph_coord[i,2] for i in mesh.simplices];
+
+mesh.vertex_to_simplex
+
+using Makie
+color = rand(size(mesh.points, 1))
+scene = Makie.mesh(mesh.points, mesh.simplices, color=color, shading=false, scale_plot=false)
+Makie.wireframe!(scene[end][1], color=(:black, 0.6), linewidth=5)
+
+#triangualte cells
+
+#merge cells into rows
+
 
 
 # For lattice - still need to evaluate which points are 'realted' to which
@@ -49,6 +80,13 @@ end
 
 A = [1 2 3 4; 5 6 7 8; 9 10 11 12]
 
+Assemblage(occ = amphdata)
+SpatialEcology.parsesingleDataFrame(amphdata)
+
+filter(:Salamandra_salamandra => x -> x > 0, amphdata)
+
+histogram2d(amphdata.Long[1:10, :],
+amphdata.Lat[1:10, :], c=:viridis)
 
 
 ## WOMBLE!
@@ -59,12 +97,20 @@ A = [1 2 3 4; 5 6 7 8; 9 10 11 12]
 
 #C::A is the co-ordiantes
 #Z::X is the Z values
-#TODO Add type to differentiate between
-function RateOfChange(C::A, Z::X) where {A <: Array{Float64, 3}, X <: Vector{Float64}}
+#TODO Add type to differentiate between co-ord layout i.e. facilitate multiple dispatch
 
-    coeff = Base.inv(C) * Z
-    𝑋 = sum(C[:,1])/3 #X co-ord
-    𝑌 = sum(C[:,2])/3 #Y co-ord
+C = cat(C[1,:],D[1,:],[1,1,1], dims =(2, 2));
+Z = rand((0:10), (10,3));
+
+RateOfChange.(C,D,Z)
+
+function RateOfChange(Lat::Vector, Long::Vector, Z::Vector) #where {Random <: GridStructure, X <: Vector{Float64}}
+
+    C = cat(Lat,Long,[1,1,1], dims =(2, 2))
+
+    coeff = Base.inv(C) * Z;
+    𝑋 = sum(C[:,1])/3; #X co-ord
+    𝑌 = sum(C[:,2])/3; #Y co-ord
 
     ∂𝑋 = coeff[2]*𝑌 + coeff[3]
     ∂𝑌 = coeff[1]*𝑋 + coeff[3]
@@ -76,19 +122,16 @@ function RateOfChange(C::A, Z::X) where {A <: Array{Float64, 3}, X <: Vector{Flo
     else
         Δ = 0;
     end
-    return Δ
-
-    θ = atan(∂𝑋/∂𝑌) + Δ,
-
-    push!(Rate(𝑚, θ))
-
-    return
+    θ = atan(∂𝑋/∂𝑌) + Δ;
+    return [𝑚, θ]
 end
 
 """
     TODO - This calulates the rate of change (𝑚) for a lattice
 """
-function RateOfChange(C::A, Z::X) where {A <: Array{Float64}, X <: Vector{Float64}}
+function RateOfChange(A::Regular) where {Regular <: GridStructure}
+
+#in theory this traverses the entire matrix
     for i in 1:(size(A, 2) - 1) #col
         for j in 1:(size(A, 1) - 1) #row
 
