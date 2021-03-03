@@ -26,7 +26,7 @@ const AG = ArchGDAL
 
 ## STEP 2: Connecting the networks in space
 
-# TODO how to Delaunay Triangulate
+# TODO how to Delaunay Triangulate - port from SciPy??
 
 #sort sites into buckets
 #sort along 1 axis and if equal then by the Second
@@ -61,8 +61,6 @@ Makie.wireframe!(scene[end][1], color=(:black, 0.6), linewidth=5)
 # For lattice - still need to evaluate which points are 'realted' to which
 
 ## STEP 3: Traverse and 'collate' the surface
-
-amphdata.Long
 
 #Range Scale between 0 & 1
 x_scaled = (amphdata.Long .- minimum(amphdata.Long))/(maximum(amphdata.Long) - minimum(amphdata.Long));
@@ -99,10 +97,7 @@ amphdata.Lat[1:10, :], c=:viridis)
 #Z::X is the Z values
 #TODO Add type to differentiate between co-ord layout i.e. facilitate multiple dispatch
 
-C = cat(C[1,:],D[1,:],[1,1,1], dims =(2, 2));
-Z = rand((0:10), (10,3));
-
-RateOfChange.(C,D,Z)
+[RateOfChange(C[i,:], D[i,:], Z[i,:]) for i in 1:10]
 
 function RateOfChange(Lat::Vector, Long::Vector, Z::Vector) #where {Random <: GridStructure, X <: Vector{Float64}}
 

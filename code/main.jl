@@ -134,7 +134,7 @@ well as an actual measure of the community
         BUT see also Pilibert 2008 - they talk a bout a bit of a different
         approach
 
-        NOTE think about the idea of ding this across 'scales' i.e. different
+        NOTE think about the idea of doing this across 'scales' i.e. different
         thresholds
 =#
 
