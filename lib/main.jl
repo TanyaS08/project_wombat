@@ -7,11 +7,6 @@
 
 =#
 
-abstract type GridStructure end; #New Parent type defining relationship between co-ords
-
-abstract type Regular <: GridStructure end; #'Perfect' grid
-abstract type Random <: GridStructure end; #Points 'random'
-
 const AG = ArchGDAL
 
 #1 test layout of co-ords to see how they are arranged
@@ -70,11 +65,6 @@ unique(sort(x_scaled))
 unique(y_scaled)
 
 minimum(x_scaled)
-
-struct Rate
-    𝑚::Float32
-    θ::Float32
-end
 
 A = [1 2 3 4; 5 6 7 8; 9 10 11 12]
 
