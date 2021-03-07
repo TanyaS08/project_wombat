@@ -81,6 +81,7 @@ yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
 
 
+# Example with lattice and bioclim data
 A = worldclim(12; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
 rescale!(A, (0.0, 1.0))
 plot(A)
