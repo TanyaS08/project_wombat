@@ -1,3 +1,10 @@
+function _rate_gradient(∂𝑋, ∂𝑌)
+    𝑚 = sqrt(∂𝑋^2 + ∂𝑌^2)
+    Δ = ∂𝑋 < 0.0  ? 180.0 : 0.0
+    θ = atan(∂𝑋/∂𝑌) + Δ
+    return (𝑚, θ)
+end
+
 """
     _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector)
 
@@ -23,11 +30,7 @@ function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     ∂𝑌 = coeff[1]*𝑋 + coeff[3]
 
     # Rate of change and direction
-    𝑚 = sqrt(exp2(∂𝑋) + exp2(∂𝑌))
-    Δ = ∂𝑋 < 0.0  ? 180.0 : 0.0
-    θ = atan(∂𝑋/∂𝑌) + Δ
-
-    return (𝑚, θ)
+    return _rate_gradient(∂𝑋, ∂𝑌)
 end
 
 """
@@ -46,9 +49,5 @@ function _rateofchange(A::Matrix{T}) where {T <: Number}
     ∂𝑌 = 𝑍₄ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄)
 
     # Rate of change and direction
-    𝑚 = sqrt(exp2(∂𝑋) + exp2(∂𝑌))
-    Δ = ∂𝑋 < 0.0  ? 180.0 : 0.0
-    θ = atan(∂𝑋/∂𝑌) + Δ
-
-    return (𝑚, θ)
+    return _rate_gradient(∂𝑋, ∂𝑌)
 end
