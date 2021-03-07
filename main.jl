@@ -16,7 +16,6 @@ NOTE refer back to Fortin & Dale (2005) and Barbujani (1989) when you inevitably
 # Import the functions and methods we need
 include(joinpath(pwd(), "lib", "rateofchange.jl"))
 
-
 # Transform the amphibian data into a raster of richness
 amphibians = DataFrame(CSV.File(joinpath(dirname(pathof(SpatialEcology)), "..", "data", "amph_Europe.csv")))
 select!(amphibians, Not(:coords))
@@ -82,30 +81,28 @@ title!("Delaunay triangulation")
 
 
 # Example with lattice and bioclim data
-A = worldclim(12; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
+# This example is a little bit faster because it has a loop to avoid the squares with empty values
+A = worldclim(1; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
 rescale!(A, (0.0, 1.0))
 plot(A)
 
-
-X = copy(A.grid)
-replace!(X, nothing => 0.0)
-X = convert(Matrix{Float64}, X)
-
 # Matrices for the strength and gradient
-𝑀 = zeros(Float64, size(X).-1)
-Θ = similar(𝑀)
+𝑀 = zeros(Float32, size(A).-1)
+Θ = copy(𝑀)
 
-for j in 1:(size(X,2)-1), i in 1:(size(X,1)-1)
-    tmp = X[i:(i+1),j:(j+1)]
+for j in 1:size(𝑀,2), i in 1:size(𝑀,1)
+    tmp = A.grid[i:(i+1),j:(j+1)]
     if !any(isnothing.(tmp))
-        if sum(tmp) != 0.0
-            𝑀[i,j], Θ[i,j] = _rateofchange(tmp)
-        end
+        𝑀[i,j], Θ[i,j] = _rateofchange(convert(Matrix{eltype(𝑀)},tmp))
     end
 end
 
 change = SimpleSDMResponse(𝑀, A)
+angle = SimpleSDMResponse(Θ, A)
 replace!(change, 0.0 => nothing)
+replace!(angle, 0.0 => nothing)
+
+plot(angle, dpi=600, c=:tokyo)
 
 qc = rescale(change, collect(0.0:0.01:1.0))
 
