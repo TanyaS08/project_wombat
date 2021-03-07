@@ -1,7 +1,7 @@
 using SpatialEcology
 using LinearAlgebra
 using DataFrames
-import CSV
+using CSV: CSV
 using SimpleSDMLayers
 using Delaunay
 using StatsPlots
@@ -122,10 +122,8 @@ end
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
 
-plot(change; dpi=600, c=:batlow)
-
 # Tenth percentile but on the log of the rate of change
-plot(rescale(log(change), [0.0, 0.90, 1.0]), dpi=600, c=:lapaz, legend=false)
+plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=600, c=:lapaz, legend=false)
 title!("Possible boundaries")
 
 qc = rescale(change, collect(0.0:0.01:1.0))
