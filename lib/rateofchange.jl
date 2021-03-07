@@ -1,7 +1,7 @@
 function _rate_gradient(∂𝑋, ∂𝑌)
     m = sqrt(∂𝑋^2 + ∂𝑌^2)
-    Δ = ∂𝑋 < 0.0  ? 180.0 : 0.0
-    θ = rad2deg(atan(∂𝑋/∂𝑌)) + Δ
+    Δ = ∂𝑋 < 0.0 ? 180.0 : 0.0
+    θ = rad2deg(atan(∂𝑋 / ∂𝑌)) + Δ
     return (m, θ)
 end
 
@@ -19,15 +19,15 @@ function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     length(x) == length(z) || throw(DimensionMismatch("x and z must have the same length"))
 
     # This adds a third column with ones, but it doesn't seem to work - inv requires a square matrix
-    C = cat(y,x,fill(one(T), length(x)), dims=(2,2))
+    C = cat(y, x, fill(one(T), length(x)); dims=(2, 2))
 
     coeff = Base.inv(C) * z
 
-    𝑋 = sum(C[:,1])/3; #X co-ord
-    𝑌 = sum(C[:,2])/3; #Y co-ord
+    𝑋 = sum(C[:, 1]) / 3 #X co-ord
+    𝑌 = sum(C[:, 2]) / 3 #Y co-ord
 
-    ∂𝑋 = coeff[2]*𝑌 + coeff[3]
-    ∂𝑌 = coeff[1]*𝑋 + coeff[3]
+    ∂𝑋 = coeff[2] * 𝑌 + coeff[3]
+    ∂𝑌 = coeff[1] * 𝑋 + coeff[3]
 
     # Rate of change and direction
     return _rate_gradient(∂𝑋, ∂𝑌)
@@ -38,13 +38,12 @@ end
 
 Returns the rate of change and the gradient for a 2x2 grid of numbers.
 """
-function _rateofchange(A::Matrix{T}) where {T <: Number}
-
-    size(A) == (2,2) || throw(DimensionMismatch("the matrix A must have size (2,2)"))
+function _rateofchange(A::Matrix{T}) where {T<:Number}
+    size(A) == (2, 2) || throw(DimensionMismatch("the matrix A must have size (2,2)"))
 
     # We can get the values directly from the matrix
-    𝑍₄,𝑍₁,𝑍₃,𝑍₂ = A
-    
+    𝑍₄, 𝑍₁, 𝑍₃, 𝑍₂ = A
+
     ∂𝑋 = 𝑍₂ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄)
     ∂𝑌 = 𝑍₄ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄)
 
