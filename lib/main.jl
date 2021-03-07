@@ -89,63 +89,6 @@ amphdata.Lat[1:10, :], c=:viridis)
 
 [RateOfChange(C[i,:], D[i,:], Z[i,:]) for i in 1:10]
 
-function RateOfChange(Lat::Vector, Long::Vector, Z::Vector) #where {Random <: GridStructure, X <: Vector{Float64}}
-
-    C = cat(Lat,Long,[1,1,1], dims =(2, 2))
-
-    coeff = Base.inv(C) * Z;
-    𝑋 = sum(C[:,1])/3; #X co-ord
-    𝑌 = sum(C[:,2])/3; #Y co-ord
-
-    ∂𝑋 = coeff[2]*𝑌 + coeff[3]
-    ∂𝑌 = coeff[1]*𝑋 + coeff[3]
-
-    𝑚 = sqrt(exp2(∂𝑋) + exp2(∂𝑌))
-
-    if ∂𝑋 < 0
-        Δ = 180;
-    else
-        Δ = 0;
-    end
-    θ = atan(∂𝑋/∂𝑌) + Δ;
-    return [𝑚, θ]
-end
-
-"""
-    TODO - This calulates the rate of change (𝑚) for a lattice
-"""
-function RateOfChange(A::Regular) where {Regular <: GridStructure}
-
-#in theory this traverses the entire matrix
-    for i in 1:(size(A, 2) - 1) #col
-        for j in 1:(size(A, 1) - 1) #row
-
-            𝑍₄ = A[j, i];
-            𝑍₃ = A[j, i + 1];
-            𝑍₂ = A[j + 1, i + 1];
-            𝑍₁ = A[j + 1, i];
-
-            ∂𝑋 = 𝑍₂ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄);
-            ∂𝑌 = 𝑍₄ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄);
-
-            𝑚 = sqrt(exp2(∂𝑋) + exp2(∂𝑌));
-
-            if ∂𝑋 < 0
-                Δ = 180;
-            else
-                Δ = 0;
-            end
-            return Δ
-
-            θ = atan(∂𝑋/∂𝑌) + Δ,
-
-            push!(Rate(𝑚, θ))
-
-        end
-    end
-end
-
-
 ## STEP 5: Threshold values
 
 ## STEP 6: Signif of candidiate boundaries
