@@ -7,8 +7,6 @@
 
 =#
 
-const AG = ArchGDAL
-
 #1 test layout of co-ords to see how they are arranged
 
 #2 Assign and return result as type of GridStructure i.e. Lattice ot Triangular

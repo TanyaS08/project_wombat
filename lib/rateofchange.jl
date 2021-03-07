@@ -5,7 +5,7 @@ Rate of change for a series of three points, defined as a series of `x` and `y`
 coordinates and a value `z`. Returns a rate of change (in units of `z`) and a
 gradient in degrees.
 """
-function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector)
+function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
 
     # Check that all three vectors have the same length
     length(x) == length(y) || throw(DimensionMismatch("x and y must have the same length"))
