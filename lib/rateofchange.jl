@@ -17,8 +17,8 @@ function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     # Check that all three vectors have the same length
     length(x) == length(y) || throw(DimensionMismatch("x and y must have the same length"))
     length(x) == length(z) || throw(DimensionMismatch("x and z must have the same length"))
-
-    # This adds a third column with ones, but it doesn't seem to work - inv requires a square matrix
+    
+    # Get the matrix of coefficients
     C = cat(y, x, fill(one(T), length(x)); dims=(2, 2))
 
     coeff = Base.inv(C) * z
