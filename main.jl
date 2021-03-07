@@ -1,10 +1,11 @@
 using SpatialEcology
 using LinearAlgebra
-using CSV, DataFrames
-using Statistics
+using DataFrames
+import CSV
 using SimpleSDMLayers
 using Delaunay
 using StatsPlots
+using Statistics
 
 theme(:mute)
 default(; frame=:box)
@@ -21,15 +22,19 @@ amphibians = DataFrame(
     CSV.File(joinpath(dirname(pathof(SpatialEcology)), "..", "data", "amph_Europe.csv"))
 )
 select!(amphibians, Not(:coords))
-richness = combine(
+
+# Get the richness map by grouping on Lat and Lon, and summing the content of the cells
+n_species = combine(
     groupby(stack(amphibians, Not([:Long, :Lat])), [:Long, :Lat]),
     :value => sum => :richness,
 )
-rename!(richness, :Long => :longitude, :Lat => :latitude)
-sort!(richness, [:latitude, :longitude])
 
-lats = sort(unique(richness.latitude))
-lons = sort(unique(richness.longitude))
+# Prepare the amphibian data with correct column names
+rename!(n_species, :Long => :longitude, :Lat => :latitude)
+sort!(n_species, [:latitude, :longitude])
+
+lats = sort(unique(n_species.latitude))
+lons = sort(unique(n_species.longitude))
 Δlat = lats[2] - lats[1]
 Δlon = lons[2] - lons[1]
 G = fill(nothing, length(lats), length(lons))
@@ -42,7 +47,7 @@ A = SimpleSDMResponse(
     maximum(lats) + 0.5Δlat,
 )
 
-for site in eachrow(richness)
+for site in eachrow(n_species)
     A[site.longitude, site.latitude] = site.richness
 end
 
@@ -61,7 +66,7 @@ X = convert(Matrix{Int64}, X)
 
 # Matrices for the strength and gradient
 𝑀 = zeros(Float64, size(X) .- 1)
-Θ = similar(𝑀)
+Θ = copy(𝑀)
 
 for j in 1:(size(X, 2) - 1), i in 1:(size(X, 1) - 1)
     𝑀[i, j], Θ[i, j] = _rateofchange(X[i:(i + 1), j:(j + 1)])
@@ -80,15 +85,15 @@ replace!(change, 0.0 => nothing)
 plot(change; frame=:box, title="Rate of change")
 
 # Do a Delaunay thingie from the sites
-coords = Matrix(richness[!, [:longitude, :latitude]])
-mesh = delaunay(coords)
+amph_points = Matrix(n_species[!, [:longitude, :latitude]])
+mesh = delaunay(amph_points)
 
 plot()
 for i in 1:size(mesh.simplices, 1)
-    c = coords[mesh.simplices[i, :], :]
+    c = amph_points[mesh.simplices[i, :], :]
     x = c[:, 1]
     y = c[:, 2]
-    z = richness.richness[mesh.simplices[i, :]]
+    z = n_species.richness[mesh.simplices[i, :]]
     m, t = _rateofchange(x, y, z)
     plot!(Shape(x, y); lab="", lw=0, fill_z=log(m), aspectratio=1)
 end
@@ -100,25 +105,24 @@ title!("Delaunay triangulation")
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
 A = worldclim(1; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
 rescale!(A, (0.0, 1.0))
-plot(A)
 
 # Matrices for the strength and gradient
-𝑀 = zeros(Float32, size(A) .- 1)
+𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
 Θ = copy(𝑀)
 
 for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
     tmp = A.grid[i:(i + 1), j:(j + 1)]
     if !any(isnothing.(tmp))
-        𝑀[i, j], Θ[i, j] = _rateofchange(convert(Matrix{eltype(𝑀)}, tmp))
+        𝑀[i, j], Θ[i, j] = _rateofchange(convert(Matrix{eltype(A)}, tmp))
+    else
+        𝑀[i, j], Θ[i, j] = (nothing, nothing)
     end
 end
 
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
-replace!(change, 0.0 => nothing)
-replace!(angle, 0.0 => nothing)
 
-plot(angle; dpi=600, c=:tokyo)
+plot(change; dpi=600, c=:batlow)
 
 qc = rescale(change, collect(0.0:0.01:1.0))
 
@@ -131,4 +135,4 @@ plot(
     dpi=600,
 )
 
-plot(qc; c=:roma, dpi=600, title="Quantiles of the rate of change") title="Quantiles of the rate of change")
+plot(qc; c=:roma, dpi=600, title="Quantiles of the rate of change")

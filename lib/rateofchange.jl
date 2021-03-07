@@ -10,8 +10,8 @@ function _rate_gradient(∂X::T, ∂Y::T) where {T<:Number}
         return (0.0, 0.0)
     end
     m = sqrt(∂X^2 + ∂Y^2)
-    Δ = !(∂X >= 0.0) ? π : 0.0
-    θ = atan(∂X , ∂Y) + Δ
+    Δ = !(∂X >= 0.0) ? 0.0 : π
+    θ = atan(∂X / ∂Y) + Δ
     θ = isnan(θ) ? 0.0 : θ
     return (m, θ)
 end
