@@ -1,17 +1,17 @@
 """
-    _rate_gradient(∂𝑋, ∂𝑌)
+    _rate_gradient(∂X, ∂Y)
 
 Returns the rate of change in units of the values stored in the
-grid, and the angle of the change in degrees. When both ∂X and ∂Y are
+grid, and the angle of the change in radians. When both ∂X and ∂Y are
 equal to 0, the angle is assumed to be 0.
 """
-function _rate_gradient(∂𝑋::T, ∂𝑌::T) where {T <: Number}
-    if ∂𝑋 == ∂𝑌 == 0.0
+function _rate_gradient(∂X::T, ∂Y::T) where {T<:Number}
+    if ∂X == ∂Y == 0.0
         return (0.0, 0.0)
     end
-    m = sqrt(∂𝑋^2 + ∂𝑌^2)
-    Δ = ∂𝑋 < 0.0 ? 180.0 : 0.0
-    θ = rad2deg(atan(∂𝑋 / ∂𝑌)) + Δ
+    m = sqrt(∂X^2 + ∂Y^2)
+    Δ = !(∂X >= 0.0) ? π : 0.0
+    θ = atan(∂X , ∂Y) + Δ
     θ = isnan(θ) ? 0.0 : θ
     return (m, θ)
 end
@@ -33,14 +33,14 @@ function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     C = cat(y, x, fill(one(T), length(x)); dims=(2, 2))
     coeff = Base.inv(C) * z
 
-    𝑋 = sum(C[:, 1]) / 3.0
-    𝑌 = sum(C[:, 2]) / 3.0
+    X = sum(C[:, 1]) / 3.0
+    Y = sum(C[:, 2]) / 3.0
 
-    ∂𝑋 = coeff[2] * 𝑌 + coeff[3]
-    ∂𝑌 = coeff[1] * 𝑋 + coeff[3]
+    ∂X = coeff[2] * Y + coeff[3]
+    ∂Y = coeff[1] * X + coeff[3]
 
     # Rate of change and direction
-    return _rate_gradient(∂𝑋, ∂𝑌)
+    return _rate_gradient(∂X, ∂Y)
 end
 
 """
@@ -52,11 +52,11 @@ function _rateofchange(A::Matrix{T}) where {T<:Number}
     size(A) == (2, 2) || throw(DimensionMismatch("the matrix A must have size (2,2)"))
 
     # We can get the values directly from the matrix
-    𝑍₄, 𝑍₁, 𝑍₃, 𝑍₂ = A
+    Z₄, Z₁, Z₃, Z₂ = A
 
-    ∂𝑋 = 𝑍₂ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄)
-    ∂𝑌 = 𝑍₄ - 𝑍₁ + 0.5(𝑍₁ - 𝑍₂ + 𝑍₃ - 𝑍₄)
+    ∂X = Z₂ - Z₁ + 0.5(Z₁ - Z₂ + Z₃ - Z₄)
+    ∂Y = Z₄ - Z₁ + 0.5(Z₁ - Z₂ + Z₃ - Z₄)
 
     # Rate of change and direction
-    return _rate_gradient(∂𝑋, ∂𝑌)
+    return _rate_gradient(∂X, ∂Y)
 end
