@@ -79,3 +79,35 @@ end
 xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
+
+
+A = worldclim(12; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
+rescale!(A, (0.0, 1.0))
+plot(A)
+
+
+X = copy(A.grid)
+replace!(X, nothing => 0.0)
+X = convert(Matrix{Float64}, X)
+
+# Matrices for the strength and gradient
+𝑀 = zeros(Float64, size(X).-1)
+Θ = similar(𝑀)
+
+for j in 1:(size(X,2)-1), i in 1:(size(X,1)-1)
+    tmp = X[i:(i+1),j:(j+1)]
+    if !any(isnothing.(tmp))
+        if sum(tmp) != 0.0
+            𝑀[i,j], Θ[i,j] = _rateofchange(tmp)
+        end
+    end
+end
+
+change = SimpleSDMResponse(𝑀, A)
+replace!(change, 0.0 => nothing)
+
+qc = rescale(change, collect(0.0:0.01:1.0))
+
+plot(change, frame=:box, title="Rate of change", clim=Tuple(quantile(collect(change), [0.1,0.90])), c=:roma, dpi=600)
+
+plot(qc, c=:roma, dpi=600, title="Quantiles of the rate of change")
