@@ -10,7 +10,12 @@ function _rate_gradient(∂X::T, ∂Y::T) where {T<:Number}
         return (0.0, 0.0)
     end
     m = sqrt(∂X^2 + ∂Y^2)
-    Δ = π#∂X < 0.0 ? 0.0 : π
+    if ∂X < 0.0
+        Δ = π;
+    else
+        Δ = 0;
+    end
+    #Δ = π#∂X < 0.0 ? 0.0 : π
     θ = atan(∂X, ∂Y) + Δ
     return (m, θ)
 end
@@ -52,7 +57,7 @@ function _rateofchange(A::Matrix{T}; X=0.5, Y=0.5) where {T<:Number}
 
     # We can get the values directly from the matrix
     Z₄, Z₁, Z₃, Z₂ = A
-    
+
     ∂X = Z₂ - Z₁ + Y*(Z₁ - Z₂ + Z₃ - Z₄)
     ∂Y = Z₄ - Z₁ + X*(Z₁ - Z₂ + Z₃ - Z₄)
 
