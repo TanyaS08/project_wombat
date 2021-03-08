@@ -1,4 +1,6 @@
 .DS_Store
 
+Manifest.toml
+
 assets/bioclim*
 assets/wc2.1*
