@@ -1,22 +1,19 @@
 """
     _rate_gradient(∂X, ∂Y)
 
-Returns the rate of change in units of the values stored in the
-grid, and the angle of the change in radians. When both ∂X and ∂Y are
-equal to 0, the angle is assumed to be 0.
+Returns the rate of change in units of the values stored in the grid, and the
+angle of the change in wind direction, *i.e.* an angle of 180 means that the
+value is increasing *from* the south. When both ∂X and ∂Y are equal to 0, the
+angle is assumed to be 0.
 """
 function _rate_gradient(∂X::T, ∂Y::T) where {T<:Number}
     if ∂X == ∂Y == 0.0
         return (0.0, 0.0)
     end
     m = sqrt(∂X^2 + ∂Y^2)
-    if ∂X < 0.0
-        Δ = π;
-    else
-        Δ = 0;
-    end
-    #Δ = π#∂X < 0.0 ? 0.0 : π
-    θ = atan(∂X, ∂Y) + Δ
+    Δ = ∂X >= 0.0 ? 0.0 : 180.0
+    θ = rad2deg(atan(∂X, ∂Y)) + Δ
+    θ = ∂X > 0.0 ? θ+180.0 : θ
     return (m, θ)
 end
 
