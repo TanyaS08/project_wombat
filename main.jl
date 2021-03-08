@@ -105,7 +105,7 @@ angle = SimpleSDMResponse(Θ, A)
 
 # Colors for North, South, East, and West -- this is a square of complementary colors
 CN, CS, CE, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
-plot(angle; c=cgrad([CE, CN, CW, CS, CE], [0.0, 0.5π, π, 1.5π, 2π]), clim=(0, 2π), dpi=400)
+plot(angle; c=cgrad([CE, CN, CW, CS, CE], [0.0, 90.0, 180.0, 270.0, 360.0]), clim=(0, 360.0), dpi=400)
 
 # Tenth percentile but on the log of the rate of change
 plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=400, c=:lapaz, legend=false)
