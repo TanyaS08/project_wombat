@@ -10,9 +10,8 @@ function _rate_gradient(∂X::T, ∂Y::T) where {T<:Number}
         return (0.0, 0.0)
     end
     m = sqrt(∂X^2 + ∂Y^2)
-    Δ = !(∂X >= 0.0) ? 0.0 : π
-    θ = atan(∂X / ∂Y) + Δ
-    θ = isnan(θ) ? 0.0 : θ
+    Δ = π#∂X < 0.0 ? 0.0 : π
+    θ = atan(∂X, ∂Y) + Δ
     return (m, θ)
 end
 
@@ -48,14 +47,14 @@ end
 
 Returns the rate of change and the gradient for a 2x2 grid of numbers.
 """
-function _rateofchange(A::Matrix{T}) where {T<:Number}
+function _rateofchange(A::Matrix{T}; X=0.5, Y=0.5) where {T<:Number}
     size(A) == (2, 2) || throw(DimensionMismatch("the matrix A must have size (2,2)"))
 
     # We can get the values directly from the matrix
     Z₄, Z₁, Z₃, Z₂ = A
-
-    ∂X = Z₂ - Z₁ + 0.5(Z₁ - Z₂ + Z₃ - Z₄)
-    ∂Y = Z₄ - Z₁ + 0.5(Z₁ - Z₂ + Z₃ - Z₄)
+    
+    ∂X = Z₂ - Z₁ + Y*(Z₁ - Z₂ + Z₃ - Z₄)
+    ∂Y = Z₄ - Z₁ + X*(Z₁ - Z₂ + Z₃ - Z₄)
 
     # Rate of change and direction
     return _rate_gradient(∂X, ∂Y)

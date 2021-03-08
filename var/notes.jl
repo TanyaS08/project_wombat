@@ -44,7 +44,7 @@ well as an actual measure of the community
 
         where 𝑓(𝑋,𝑌) is a bilinear function of values 𝑧ᵢ at the
         four sampling locations (𝑖 = 1, 2, 3, 4)
-        here 𝑧ᵢ would be our vaariable of interest e.g. a network property
+        here 𝑧ᵢ would be our variable of interest e.g. a network property
 
         𝑓(𝑋,𝑌) = 𝑧₁(1 - 𝑋)(1 - 𝑌) + 𝑧₂𝑋(1 - 𝑌) + 𝑧₃𝑋𝑌 + 𝑧₄(1 - 𝑋)𝑌
 
@@ -54,11 +54,11 @@ well as an actual measure of the community
 
         and
 
-        ∂𝑓(𝑋,𝑌)/∂𝑌 = 𝑧₃ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)
+        ∂𝑓(𝑋,𝑌)/∂𝑌 = 𝑧₄ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)
 
         essentially meaning that:
 
-        𝑚 = √[𝑧₂ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)]²+ [𝑧₃ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)]²
+        𝑚 = √[𝑧₂ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)]²+ [𝑧₄ - 𝑧₁ + 𝑋(𝑧₁ - 𝑧₂ + 𝑧₃ - 𝑧₄)]²
 
     𝑚 it the 'new centroid' and represents the 'average' of 4 samples/squares
 

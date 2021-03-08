@@ -60,30 +60,6 @@ plot(
     title="Species richness",
 )
 
-X = copy(A.grid)
-replace!(X, nothing => 0)
-X = convert(Matrix{Int64}, X)
-
-# Matrices for the strength and gradient
-𝑀 = zeros(Float64, size(X) .- 1)
-Θ = copy(𝑀)
-
-for j in 1:(size(X, 2) - 1), i in 1:(size(X, 1) - 1)
-    𝑀[i, j], Θ[i, j] = _rateofchange(X[i:(i + 1), j:(j + 1)])
-end
-
-change = SimpleSDMResponse(𝑀, A)
-for lat in latitudes(change)
-    for lon in longitudes(change)
-        if isnothing(A[lon, lat])
-            change[lon, lat] = 0.0
-        end
-    end
-end
-replace!(change, 0.0 => nothing)
-
-plot(change; frame=:box, title="Rate of change")
-
 # Do a Delaunay thingie from the sites
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
 mesh = delaunay(amph_points)
@@ -95,16 +71,20 @@ for i in 1:size(mesh.simplices, 1)
     y = c[:, 2]
     z = n_species.richness[mesh.simplices[i, :]]
     m, t = _rateofchange(x, y, z)
-    plot!(Shape(x, y); lab="", lw=0, fill_z=log(m), aspectratio=1)
+    plot!(Shape(x, y); lab="", lw=0, fill_z=t, aspectratio=1)
 end
 xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
 
+
+
+
 # Example with lattice and bioclim data
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
-A = worldclim(1; left=-180.0, right=180.0, bottom=-62.0, top=90.0)
+A = worldclim(12; bottom=-60.0)
 rescale!(A, (0.0, 1.0))
+plot(A)
 
 # Matrices for the strength and gradient
 𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
@@ -113,7 +93,8 @@ rescale!(A, (0.0, 1.0))
 for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
     tmp = A.grid[i:(i + 1), j:(j + 1)]
     if !any(isnothing.(tmp))
-        𝑀[i, j], Θ[i, j] = _rateofchange(convert(Matrix{eltype(A)}, tmp))
+        tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀[i, j], Θ[i, j] = _rateofchange(tmp; X=stride(A, 1), Y=stride(A, 2))
     else
         𝑀[i, j], Θ[i, j] = (nothing, nothing)
     end
@@ -122,19 +103,23 @@ end
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
 
+# Colors for North, South, East, and West -- this is a square of complementary colors
+CN, CS, CE, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
+plot(angle; c=cgrad([CE, CN, CW, CS, CE], [0.0, 0.5π, π, 1.5π, 2π]), clim=(0, 2π), dpi=400)
+
 # Tenth percentile but on the log of the rate of change
-plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=600, c=:lapaz, legend=false)
+plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=400, c=:lapaz, legend=false)
 title!("Possible boundaries")
 
-qc = rescale(change, collect(0.0:0.01:1.0))
-
 plot(
-    change;
+    log1p(change);
     frame=:box,
     title="Rate of change",
-    clim=Tuple(quantile(collect(change), [0.1, 0.90])),
-    c=:roma,
-    dpi=600,
+    dpi=400,
 )
 
-plot(qc; c=:roma, dpi=600, title="Quantiles of the rate of change")
+plot(
+    rescale(change, collect(0.0:0.01:1.0));
+    dpi=400,
+    title="Quantiles of the rate of change",
+)
