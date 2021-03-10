@@ -51,6 +51,8 @@ for site in eachrow(n_species)
     A[site.longitude, site.latitude] = site.richness
 end
 
+A = convert(Float64, A)
+
 # Map
 plot(
     convert(Float32, A);
@@ -82,7 +84,7 @@ title!("Delaunay triangulation")
 
 # Example with lattice and bioclim data
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
-A = worldclim(12; bottom=-60.0)
+A = worldclim(3; bottom=-60.0)
 rescale!(A, (0.0, 1.0))
 plot(A)
 
@@ -112,7 +114,7 @@ plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=400, c=:lapaz, legend=false)
 title!("Possible boundaries")
 
 plot(
-    log1p(change);
+    change;
     frame=:box,
     title="Rate of change",
     dpi=400,
