@@ -1,11 +1,11 @@
-using SpatialEcology
-using LinearAlgebra
-using DataFrames
 using CSV: CSV
-using SimpleSDMLayers
+using DataFrames
 using Delaunay
-using StatsPlots
+using LinearAlgebra
+using SimpleSDMLayers
+using SpatialEcology
 using Statistics
+using StatsPlots
 
 theme(:mute)
 default(; frame=:box)
@@ -46,6 +46,7 @@ A = SimpleSDMResponse(
     minimum(lats) - 0.5Δlat,
     maximum(lats) + 0.5Δlat,
 )
+
 
 for site in eachrow(n_species)
     A[site.longitude, site.latitude] = site.richness
