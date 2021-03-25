@@ -2,6 +2,7 @@ using CSV: CSV
 using DataFrames
 using Delaunay
 using LinearAlgebra
+using NeutralLandscapes
 using SimpleSDMLayers
 using SpatialEcology
 using Statistics
@@ -97,7 +98,9 @@ for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
     tmp = A.grid[i:(i + 1), j:(j + 1)]
     if !any(isnothing.(tmp))
         tmp = convert(Matrix{eltype(A)}, tmp)
-        𝑀[i, j], Θ[i, j] = _rateofchange(tmp; X=stride(A, 1), Y=stride(A, 2))
+        𝑀[i, j], Θ[i, j] = _rateofchange(tmp; 
+                                          X = stride(A, 1), Y = stride(A, 2)
+                                          )
     else
         𝑀[i, j], Θ[i, j] = (nothing, nothing)
     end
@@ -126,3 +129,85 @@ plot(
     dpi=400,
     title="Quantiles of the rate of change",
 )
+
+
+# Example with lattice and NeutralLandscapes
+#which is ugly becuase I didnt feel like thinking
+siz = 50, 50
+
+
+cluster = rand(RectangularCluster(4, 8), siz)
+random = rand(NoGradient(), siz)
+edge = rand(EdgeGradient(), siz)
+planar = rand(PlanarGradient(), siz)
+midpt = rand(MidpointDisplacement(0.75), siz)
+
+A = cluster
+
+
+𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
+Θ = copy(𝑀)
+
+for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
+    tmp = A[i:(i + 1), j:(j + 1)]
+        #tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀[i, j], Θ[i, j] = _rateofchange(tmp)
+end
+
+𝑀_r = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(random) .- 1))
+Θ_r = copy(𝑀_r)
+
+for j in 1:size(𝑀_r, 2), i in 1:size(𝑀_r, 1)
+    tmp = random[i:(i + 1), j:(j + 1)]
+        #tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀_r[i, j], Θ_r[i, j] = _rateofchange(tmp)
+end
+
+𝑀_e = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(edge) .- 1))
+Θ_e = copy(𝑀_e)
+
+for j in 1:size(𝑀_e, 2), i in 1:size(𝑀_e, 1)
+    tmp = edge[i:(i + 1), j:(j + 1)]
+        #tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀_e[i, j], Θ_e[i, j] = _rateofchange(tmp)
+end
+
+𝑀_p = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(planar) .- 1))
+Θ_p = copy(𝑀_p)
+
+for j in 1:size(𝑀_p, 2), i in 1:size(𝑀_p, 1)
+    tmp = planar[i:(i + 1), j:(j + 1)]
+        #tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀_p[i, j], Θ_p[i, j] = _rateofchange(tmp)
+end
+
+𝑀_m = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(midpt) .- 1))
+Θ_m = copy(𝑀_m)
+
+for j in 1:size(𝑀_m, 2), i in 1:size(𝑀_m, 1)
+    tmp = midpt[i:(i + 1), j:(j + 1)]
+        #tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀_m[i, j], Θ_m[i, j] = _rateofchange(tmp)
+end
+
+gr(color = :fire, ticks = false, framestyle = :box, colorbar = false)
+plot(
+    plot(heatmap(cluster), title = "Cluster"), heatmap(𝑀), heatmap(Θ),
+    plot(heatmap(random), title = "Random"), heatmap(𝑀_r), heatmap(Θ_r),
+    plot(heatmap(edge), title = "Edge"), heatmap(𝑀_e), heatmap(Θ_e),
+    plot(heatmap(planar), title = "Planar"), heatmap(𝑀_p), heatmap(Θ_p),
+    plot(heatmap(midpt), title = "Midpt"), heatmap(𝑀_m), heatmap(Θ_m),
+    layout = (5, 3), size = (1600, 1370))
+
+png("NeutralLandscapes")
+
+plot(
+    heatmap(Θ)
+    )
+
+
+sort(𝑀[:, 1], dims = 1)
+
+a = 𝑀[:, 1]
+b = partialsortperm(a, 1:10)
+collect(zip(b, a[b]))
