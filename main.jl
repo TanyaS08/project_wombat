@@ -145,7 +145,7 @@ midpt = rand(MidpointDisplacement(0.75), siz)
 A = cluster
 
 
-𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
+𝑀 = convert(Matrix{Union{Float32}}, zeros(Float32, size(A) .- 1))
 Θ = copy(𝑀)
 
 for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
@@ -208,6 +208,19 @@ plot(
 
 sort(𝑀[:, 1], dims = 1)
 
+C = Any[]
+
+for i in 1:size(𝑀, 1)
+
+    max = size(𝑀[:, i], 1)
+    min = max - convert(Int64, round(max*0.1, digits = 0))
+    a = 𝑀[:, i]
+    b = partialsortperm(a, min:max)
+    
+    push!(C, a[b])
+
+end
+
 a = 𝑀[:, 1]
 b = partialsortperm(a, 1:10)
-collect(zip(b, a[b]))
+collect(a[b])
