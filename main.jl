@@ -1,3 +1,6 @@
+import Pkg
+Pkg.activate()
+
 using CSV: CSV
 using DataFrames
 using Delaunay
@@ -7,6 +10,7 @@ using SimpleSDMLayers
 using SpatialEcology
 using Statistics
 using StatsPlots
+using Plots
 
 theme(:mute)
 default(; frame=:box)
@@ -98,7 +102,7 @@ for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
     tmp = A.grid[i:(i + 1), j:(j + 1)]
     if !any(isnothing.(tmp))
         tmp = convert(Matrix{eltype(A)}, tmp)
-        𝑀[i, j], Θ[i, j] = _rateofchange(tmp; 
+        𝑀[i, j], Θ[i, j] = _rateofchange(tmp;
                                           X = stride(A, 1), Y = stride(A, 2)
                                           )
     else
@@ -132,7 +136,7 @@ plot(
 
 
 # Example with lattice and NeutralLandscapes
-#which is ugly becuase I didnt feel like thinking
+# which is ugly because I didnt feel like thinking
 siz = 50, 50
 
 
@@ -190,14 +194,14 @@ for j in 1:size(𝑀_m, 2), i in 1:size(𝑀_m, 1)
         𝑀_m[i, j], Θ_m[i, j] = _rateofchange(tmp)
 end
 
-gr(color = :fire, ticks = false, framestyle = :box, colorbar = false)
+gr(color = :viridis, ticks = false, framestyle = :box, colorbar = false, aspectratio = 1)
 plot(
     plot(heatmap(cluster), title = "Cluster"), heatmap(𝑀), heatmap(Θ),
     plot(heatmap(random), title = "Random"), heatmap(𝑀_r), heatmap(Θ_r),
     plot(heatmap(edge), title = "Edge"), heatmap(𝑀_e), heatmap(Θ_e),
     plot(heatmap(planar), title = "Planar"), heatmap(𝑀_p), heatmap(Θ_p),
-    plot(heatmap(midpt), title = "Midpt"), heatmap(𝑀_m), heatmap(Θ_m),
-    layout = (5, 3), size = (1600, 1370))
+    plot(heatmap(midpt), title = "Mid point"), heatmap(𝑀_m), heatmap(Θ_m),
+    layout = (5, 3), size = (750, 1400))
 
 png("NeutralLandscapes")
 
@@ -216,7 +220,7 @@ for i in 1:size(𝑀, 1)
     min = max - convert(Int64, round(max*0.1, digits = 0))
     a = 𝑀[:, i]
     b = partialsortperm(a, min:max)
-    
+
     push!(C, a[b])
 
 end
