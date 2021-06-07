@@ -92,7 +92,9 @@ title!("Delaunay triangulation")
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
 A = worldclim(3; bottom=-60.0)
 rescale!(A, (0.0, 1.0))
-plot(A)
+plot(A,
+background_color = :transparent,
+foreground_color = :black,)
 
 png("figures/Isothermality")
 
@@ -117,13 +119,23 @@ angle = SimpleSDMResponse(Θ, A)
 
 # Colors for North, South, East, and West -- this is a square of complementary colors
 CE, CS, CN, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
-plot(angle; c=cgrad([CN, CE, CW, CS, CN], [0.0, 90.0, 180.0, 270.0, 360.0]), clim=(0, 360.0), dpi=400)
+plot(angle; 
+    c=cgrad([CN, CE, CW, CS, CN], [0.0, 90.0, 180.0, 270.0, 360.0]), 
+    clim=(0, 360.0), 
+    dpi=400,
+    background_color = :transparent,
+    foreground_color = :black,)
 title!("Direction of Change")
 
 png("figures/DirectionofChange")
 
 # Tenth percentile but on the log of the rate of change
-plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=400, c=:lapaz, legend=false)
+plot(rescale(log(change), 
+    [0.0, 0.90, 1.0]); 
+    dpi=400, c=:lapaz, 
+    legend=false,
+    background_color = :transparent,
+    foreground_color = :black,)
 title!("Possible boundaries")
 
 png("figures/PossibleBoundaries")
@@ -133,6 +145,8 @@ plot(
     frame=:box,
     title="Rate of change",
     dpi=400,
+    background_color = :transparent,
+    foreground_color = :black,
 )
 
 png("figures/RateofChange_log")
@@ -141,6 +155,8 @@ plot(
     rescale(change, collect(0.0:0.01:1.0));
     dpi=400,
     title="Quantiles of the rate of change",
+    background_color = :transparent,
+    foreground_color = :black,
 )
 
 png("figures/Quantiles_RateofChange")
