@@ -94,6 +94,8 @@ A = worldclim(3; bottom=-60.0)
 rescale!(A, (0.0, 1.0))
 plot(A)
 
+png("figures/Isothermality")
+
 # Matrices for the strength and gradient
 𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
 Θ = copy(𝑀)
@@ -114,19 +116,26 @@ change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
 
 # Colors for North, South, East, and West -- this is a square of complementary colors
-CN, CS, CE, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
-plot(angle; c=cgrad([CE, CN, CW, CS, CE], [0.0, 90.0, 180.0, 270.0, 360.0]), clim=(0, 360.0), dpi=400)
+CE, CS, CN, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
+plot(angle; c=cgrad([CN, CE, CW, CS, CN], [0.0, 90.0, 180.0, 270.0, 360.0]), clim=(0, 360.0), dpi=400)
+title!("Direction of Change")
+
+png("figures/DirectionofChange")
 
 # Tenth percentile but on the log of the rate of change
 plot(rescale(log(change), [0.0, 0.90, 1.0]); dpi=400, c=:lapaz, legend=false)
 title!("Possible boundaries")
 
+png("figures/PossibleBoundaries")
+
 plot(
-    change;
+    log(change);
     frame=:box,
     title="Rate of change",
     dpi=400,
 )
+
+png("figures/RateofChange_log")
 
 plot(
     rescale(change, collect(0.0:0.01:1.0));
@@ -134,6 +143,7 @@ plot(
     title="Quantiles of the rate of change",
 )
 
+png("figures/Quantiles_RateofChange")
 
 # Example with lattice and NeutralLandscapes
 # which is ugly because I didnt feel like thinking
@@ -203,7 +213,7 @@ plot(
     plot(heatmap(midpt), title = "Mid point"), heatmap(𝑀_m), heatmap(Θ_m),
     layout = (5, 3), size = (750, 1400))
 
-png("NeutralLandscapes")
+png("figures/NeutralLandscapes")
 
 plot(
     heatmap(Θ)
