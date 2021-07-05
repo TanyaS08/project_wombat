@@ -69,6 +69,8 @@ plot(
     title="Species richness",
 )
 scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
+png("figures/spp_rich_boundaries")
+
 
 # Do a Delaunay thingie from the sites
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
