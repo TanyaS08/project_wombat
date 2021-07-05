@@ -68,6 +68,7 @@ plot(
     frame=:box,
     title="Species richness",
 )
+scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
 
 # Do a Delaunay thingie from the sites
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
@@ -87,6 +88,7 @@ end
 xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
+scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black)
 
 c = hcat(x, y)[mesh.simplices[1, :], :]
 x = c[:, 1]
@@ -104,8 +106,8 @@ for i in 1:size(mesh.simplices, 1)
     m, t = _rateofchange(x, y, z)
 end
 
-x = amph_points[:, 2]
-y = amph_points[:, 1]
+x = amph_points[:, 1]
+y = amph_points[:, 2]
 z = n_species.richness
 
 hcat(x, y)
@@ -113,12 +115,12 @@ hcat(x, y)
 delaunay(hcat(x, y))
 
 """
-    triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
+    Wombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
 
 Wrapper function that implements the triangualtion wombling algorithm for points 
 that are irregualrly arranged in space.
 """
-function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
+function Wombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     length(x) >= 3  || throw(DimensionMismatch("x must have a minimum length of 3"))
 
     # Do Delaunay thingie for sites
@@ -144,7 +146,12 @@ function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:
     return DataFrame(𝑀 = _𝑀, Θ = _Θ, Long = _X, Lat = _Y)
 end
 
-triangulationwombling(x, y, z)
+df = Wombling(x, y, z)
+
+sort!(df, :𝑀, rev = true)
+pct = round(nrow(df)*0.1)
+
+df[1:195, :]
 
 
 
