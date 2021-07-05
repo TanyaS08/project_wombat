@@ -120,6 +120,8 @@ that are irregualrly arranged in space.
 """
 function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     length(x) >= 3  || throw(DimensionMismatch("x must have a minimum length of 3"))
+    length(x) == length(y) || throw(DimensionMismatch("x and y must have the same length"))
+    length(x) == length(z) || throw(DimensionMismatch("x and z must have the same length"))
 
     # Do Delaunay thingie for sites
     mesh = delaunay(hcat(x, y))
@@ -129,6 +131,7 @@ function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:
         x = c[:, 1]
         y = c[:, 2]
         z = z[mesh.simplices[i, :]]
+        return x, y, z
     end
 
     # Rate of change and direction
