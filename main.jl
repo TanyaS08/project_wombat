@@ -1,5 +1,6 @@
+using SimpleSDMLayers: hcat
 import Pkg
-Pkg.activate()
+Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
 
 using CSV: CSV
 using DataFrames
@@ -72,6 +73,8 @@ plot(
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
 mesh = delaunay(amph_points)
 
+
+
 plot()
 for i in 1:size(mesh.simplices, 1)
     c = amph_points[mesh.simplices[i, :], :]
@@ -85,6 +88,54 @@ xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
 
+c = hcat(x, y)[mesh.simplices[1, :], :]
+x = c[:, 1]
+y = c[:, 2]
+z = n_species.richness[mesh.simplices[1, :]]
+m, t = _rateofchange(x, y, z)
+
+
+
+for i in 1:size(mesh.simplices, 1)
+    c = amph_points[mesh.simplices[i, :], :]
+    x = c[:, 1]
+    y = c[:, 2]
+    z = n_species.richness[mesh.simplices[i, :]]
+    m, t = _rateofchange(x, y, z)
+end
+
+x = amph_points[:, 2]
+y = amph_points[:, 1]
+z = n_species.richness
+
+hcat(x, y)
+
+delaunay(hcat(x, y))
+
+"""
+    triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
+
+Wrapper function that implements the triangualtion wombling algorithm for points 
+that are irregualrly arranged in space.
+"""
+function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
+    length(x) >= 3  || throw(DimensionMismatch("x must have a minimum length of 3"))
+
+    # Do Delaunay thingie for sites
+    mesh = delaunay(hcat(x, y))
+
+    for i in 1:size(mesh.simplices, 1)
+        c = hcat(x, y)[mesh.simplices[i, :], :]
+        x = c[:, 1]
+        y = c[:, 2]
+        z = z[mesh.simplices[i, :]]
+    end
+
+    # Rate of change and direction
+    return _rateofchange(x, y, z)
+end
+
+triangulationwombling(x, y, z)
 
 
 
