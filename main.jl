@@ -120,22 +120,24 @@ that are irregualrly arranged in space.
 """
 function triangulationwombling(x::Vector{T}, y::Vector{T}, z::Vector) where {T<:Number}
     length(x) >= 3  || throw(DimensionMismatch("x must have a minimum length of 3"))
-    length(x) == length(y) || throw(DimensionMismatch("x and y must have the same length"))
-    length(x) == length(z) || throw(DimensionMismatch("x and z must have the same length"))
 
     # Do Delaunay thingie for sites
     mesh = delaunay(hcat(x, y))
 
+    𝑀 = Vector{Float64}(undef, size(mesh.simplices, 1))
+    Θ = copy(𝑀)
+
     for i in 1:size(mesh.simplices, 1)
         c = hcat(x, y)[mesh.simplices[i, :], :]
-        x = c[:, 1]
-        y = c[:, 2]
-        z = z[mesh.simplices[i, :]]
-        return x, y, z
+        _x = c[:, 1]
+        _y = c[:, 2]
+        _z = z[mesh.simplices[i, :]]
+        𝑀[i] = _rateofchange(_x, _y, _z)[1]
+        Θ[i] = _rateofchange(_x, _y, _z)[2]
     end
 
     # Rate of change and direction
-    return _rateofchange(x, y, z)
+    return 𝑀, Θ
 end
 
 triangulationwombling(x, y, z)
