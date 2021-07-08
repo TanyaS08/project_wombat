@@ -1,4 +1,5 @@
-using SimpleSDMLayers: hcat, DataFrame
+using Base: isgreater
+using SimpleSDMLayers: convert
 import Pkg
 Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
 
@@ -10,8 +11,11 @@ using NeutralLandscapes
 using SimpleSDMLayers
 using SpatialEcology
 using Statistics
+using StatsBase
 using StatsPlots
 using Plots
+
+
 
 theme(:mute)
 default(; frame=:box)
@@ -185,6 +189,45 @@ end
 
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
+
+denserank(replace(𝑀 , nothing => missing))
+
+replace(𝑀 , nothing => missing)
+𝑀_n = denserank(replace(𝑀 , nothing => missing), rev=true)
+
+
+denserank([1,3,67,4,missing], rev=true)
+missing*1
+
+replace(𝑀_n , missing => nothing)
+
+size(𝑀, 2)*size(𝑀, 1)*0.1
+
+replace!(x -> isless(x, 194311) ? 1 : missing, 𝑀_n)
+𝑀_b = replace(𝑀_n , missing => nothing)
+change = SimpleSDMResponse(𝑀_b, A)
+
+findall(x -> x >= 194309, 𝑀_n)
+
+𝑀_b = copy(𝑀_n)
+
+for j in 1:size(𝑀_n, 2), i in 1:size(𝑀_n, 1)
+    if ismissing(𝑀_n[i, j])
+        𝑀_b[i, j] = 𝑀_n[i, j]
+    else
+        tmp = replace(x -> isless(x, 194309) ? missing : 1, 𝑀_n[i, j])
+        𝑀_b[i, j] = tmp
+    end
+end
+
+plot(rescale(log(change), 
+    [0.0, 0.90, 1.0]); 
+    dpi=400, c=:lapaz, 
+    legend=false,
+    background_color = :transparent,
+    foreground_color = :black,)
+title!("Possible boundaries")
+
 
 # Colors for North, South, East, and West -- this is a square of complementary colors
 CE, CS, CN, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
