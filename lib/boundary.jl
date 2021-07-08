@@ -1,24 +1,19 @@
-𝑀[90,50:55]
+"""
+    Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold::Float32=0.1)
 
-sort(𝑀; dims = 1)
+Extracts candidate boundaries using calculated rates of change (𝑀) on specified 
+threshold. Default threshold is 10%.
+"""
+function Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold=0.1)
 
-filter(isnumeric, 𝑀)
+    𝑀 = 𝑀
+    thresh = threshold
+    rank = floor(Int, size(𝑀, 2)*size(𝑀, 1)*thresh)
+    𝑀_n = denserank(replace(𝑀 , nothing => missing), #need to use type::missing
+                    rev=true) # ranks largest to smallest
 
-function Base.sortperm(A::AbstractMatrix, dim::Integer)
-    P = mapslices(sortperm, A, dim)
-    if dim == 1
-        for j = 1:size(P,2)
-            offset = (j-1) * size(P,1)
-            for i = 1:size(P,1)
-                P[i,j] += offset
-            end
-        end
-    else # if dim == 2
-        for j = 1:size(P,2)
-            for i = 1:size(P,1)
-                P[i,j] = (P[i,j] - 1) * size(P,1) + i
-            end
-        end
-    end
-    return P
+    replace!(x -> isless(x, rank) ? 1 : missing, 𝑀_n) # assigns all in above threshold to 1
+
+    # Rate of change and direction
+    return replace(𝑀_n , missing => nothing) #back to type::nothing to play with SDMSimple
 end
