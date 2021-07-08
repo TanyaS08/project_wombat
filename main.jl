@@ -82,7 +82,11 @@ png("figures/spp_rich_boundaries")
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
 mesh = delaunay(amph_points)
 
+x = amph_points[:, 1]
+y = amph_points[:, 2]
+z = n_species.richness
 
+df = Wombling(x, y, z)
 
 plot()
 for i in 1:size(mesh.simplices, 1)
@@ -97,39 +101,6 @@ xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
 scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black)
-
-c = hcat(x, y)[mesh.simplices[1, :], :]
-x = c[:, 1]
-y = c[:, 2]
-z = n_species.richness[mesh.simplices[1, :]]
-m, t = _rateofchange(x, y, z)
-
-
-
-for i in 1:size(mesh.simplices, 1)
-    c = amph_points[mesh.simplices[i, :], :]
-    x = c[:, 1]
-    y = c[:, 2]
-    z = n_species.richness[mesh.simplices[i, :]]
-    m, t = _rateofchange(x, y, z)
-end
-
-x = amph_points[:, 1]
-y = amph_points[:, 2]
-z = n_species.richness
-
-hcat(x, y)
-
-delaunay(hcat(x, y))
-
-df = Wombling(x, y, z)
-
-sort!(df, :𝑀, rev = true)
-pct = round(nrow(df)*0.1)
-
-df[1:195, :]
-
-
 
 # Example with lattice and bioclim data
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
