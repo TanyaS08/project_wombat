@@ -190,38 +190,33 @@ end
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
 
-denserank(replace(𝑀 , nothing => missing))
 
-replace(𝑀 , nothing => missing)
-𝑀_n = denserank(replace(𝑀 , nothing => missing), rev=true)
+"""
+    Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold::Float32=0.1)
 
+Extracts candidate boundaries using calculated rates of change (𝑀) on specified 
+threshold. Default threshold is 10%.
+"""
+function Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold=0.1)
 
-denserank([1,3,67,4,missing], rev=true)
-missing*1
+    𝑀 = 𝑀
+    thresh = threshold
+    rank = floor(Int, size(𝑀, 2)*size(𝑀, 1)*thresh)
+    𝑀_n = denserank(replace(𝑀 , nothing => missing), #need to use type::missing
+                    rev=true) # ranks largest to smallest
 
-replace(𝑀_n , missing => nothing)
+    replace!(x -> isless(x, rank) ? 1 : missing, 𝑀_n) # assigns all in above threshold to 1
 
-size(𝑀, 2)*size(𝑀, 1)*0.1
-
-replace!(x -> isless(x, 194311) ? 1 : missing, 𝑀_n)
-𝑀_b = replace(𝑀_n , missing => nothing)
-change = SimpleSDMResponse(𝑀_b, A)
-
-findall(x -> x >= 194309, 𝑀_n)
-
-𝑀_b = copy(𝑀_n)
-
-for j in 1:size(𝑀_n, 2), i in 1:size(𝑀_n, 1)
-    if ismissing(𝑀_n[i, j])
-        𝑀_b[i, j] = 𝑀_n[i, j]
-    else
-        tmp = replace(x -> isless(x, 194309) ? missing : 1, 𝑀_n[i, j])
-        𝑀_b[i, j] = tmp
-    end
+    # Rate of change and direction
+    return replace(𝑀_n , missing => nothing) #back to type::nothing to play with SDMSimple
 end
 
-plot(rescale(log(change), 
-    [0.0, 0.90, 1.0]); 
+𝑀_b = Boundaries(𝑀)
+
+change = SimpleSDMResponse(𝑀_b, A)
+
+plot(rescale(change, 
+    (0.0, 1.0)); 
     dpi=400, c=:lapaz, 
     legend=false,
     background_color = :transparent,
