@@ -75,7 +75,7 @@ z = n_species.richness
 # womble!
 df = Wombling(x, y, z)
 
-# wombled triangles with candidate boundaries
+# wombled triangles (with roate of change) with candidate boundaries
 plot()
 for i in 1:size(mesh.simplices, 1)
     c = amph_points[mesh.simplices[i, :], :]
@@ -100,7 +100,6 @@ plot(
 )
 scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
 png("figures/spp_rich_boundaries")
-
 
 
 # Example with lattice and bioclim data
@@ -132,19 +131,9 @@ end
 change = SimpleSDMResponse(𝑀, A)
 angle = SimpleSDMResponse(Θ, A)
 
-
 𝑀_b = Boundaries(𝑀)
 
-change = SimpleSDMResponse(𝑀_b, A)
-
-plot(rescale(change, 
-    (0.0, 1.0)); 
-    dpi=400, c=:lapaz, 
-    legend=false,
-    background_color = :transparent,
-    foreground_color = :black,)
-title!("Possible boundaries")
-
+boundaries = SimpleSDMResponse(𝑀_b, A)
 
 # Colors for North, South, East, and West -- this is a square of complementary colors
 CE, CS, CN, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
@@ -155,18 +144,16 @@ plot(angle;
     background_color = :transparent,
     foreground_color = :black,)
 title!("Direction of Change")
-
 png("figures/DirectionofChange")
 
-# Tenth percentile but on the log of the rate of change
-plot(rescale(log(change), 
+#candidate boundaries using the Boundaries()
+plot(rescale(log(boundaries), 
     [0.0, 0.90, 1.0]); 
     dpi=400, c=:lapaz, 
     legend=false,
     background_color = :transparent,
     foreground_color = :black,)
 title!("Possible boundaries")
-
 png("figures/PossibleBoundaries")
 
 plot(
@@ -177,7 +164,6 @@ plot(
     background_color = :transparent,
     foreground_color = :black,
 )
-
 png("figures/RateofChange_log")
 
 plot(
@@ -187,7 +173,6 @@ plot(
     background_color = :transparent,
     foreground_color = :black,
 )
-
 png("figures/Quantiles_RateofChange")
 
 # Example with lattice and NeutralLandscapes
