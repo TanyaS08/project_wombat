@@ -1,21 +1,19 @@
-using Base: isgreater
-using SimpleSDMLayers: convert
 import Pkg
 Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
 
+using Base: isgreater
 using CSV: CSV
 using DataFrames
 using Delaunay
 using LinearAlgebra
 using NeutralLandscapes
 using SimpleSDMLayers
+using SimpleSDMLayers: convert
 using SpatialEcology
 using Statistics
 using StatsBase
 using StatsPlots
 using Plots
-
-
 
 theme(:mute)
 default(; frame=:box)
@@ -66,19 +64,7 @@ end
 
 A = convert(Float64, A)
 
-# Map
-plot(
-    convert(Float32, A);
-    c=:batlow,
-    clim=(0, maximum(A)),
-    frame=:box,
-    title="Species richness",
-)
-scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
-png("figures/spp_rich_boundaries")
-
-
-# Do a Delaunay thingie from the sites
+# Make poits 'irregular' to test Delauney
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
 mesh = delaunay(amph_points)
 
@@ -86,8 +72,10 @@ x = amph_points[:, 1]
 y = amph_points[:, 2]
 z = n_species.richness
 
+# womble!
 df = Wombling(x, y, z)
 
+# wombled triangles with candidate boundaries
 plot()
 for i in 1:size(mesh.simplices, 1)
     c = amph_points[mesh.simplices[i, :], :]
@@ -100,7 +88,20 @@ end
 xaxis!("Longitude", extrema(longitudes(A)))
 yaxis!("Latitude", extrema(latitudes(A)))
 title!("Delaunay triangulation")
-scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black)
+scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
+
+# Map - with candidate boundaries
+plot(
+    convert(Float32, A);
+    c=:batlow,
+    clim=(0, maximum(A)),
+    frame=:box,
+    title="Species richness",
+)
+scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
+png("figures/spp_rich_boundaries")
+
+
 
 # Example with lattice and bioclim data
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
