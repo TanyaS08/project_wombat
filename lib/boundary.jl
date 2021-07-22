@@ -14,6 +14,6 @@ function Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold=0.1)
 
     replace!(x -> isless(x, rank) ? 1 : missing, 𝑀_n) # assigns all in above threshold to 1
 
-    # Rate of change and direction
+    # candidate boundary
     return replace(𝑀_n , missing => nothing) #back to type::nothing to play with SDMSimple
 end
