@@ -10,7 +10,7 @@ function Boundaries(𝑀::Matrix{Union{Nothing, Float32}}; threshold=0.1)
     thresh = threshold
     rank = floor(Int, size(𝑀, 2)*size(𝑀, 1)*thresh)
     𝑀_n = denserank(replace(𝑀 , nothing => missing), #need to use type::missing
-                    rev=true) # ranks largest to smallest
+                    rev = true) # ranks largest to smallest
 
     replace!(x -> isless(x, rank) ? 1 : missing, 𝑀_n) # assigns all in above threshold to 1
 
