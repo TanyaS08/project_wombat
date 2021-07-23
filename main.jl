@@ -101,6 +101,55 @@ plot(
 scatter!(df[1:195, 3], df[1:195, 4], markersize = 2, color = :black, legend = false)
 png("figures/spp_rich_boundaries")
 
+# Example with lattice and amphibian data (as lattice)
+
+𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
+Θ = copy(𝑀)
+
+for j in 1:size(𝑀, 2), i in 1:size(𝑀, 1)
+    tmp = A.grid[i:(i + 1), j:(j + 1)]
+    if !any(isnothing.(tmp))
+        tmp = convert(Matrix{eltype(A)}, tmp)
+        𝑀[i, j], Θ[i, j] = _rateofchange(tmp;
+                                          X = stride(A, 1), Y = stride(A, 2)
+                                          )
+    else
+        𝑀[i, j], Θ[i, j] = (nothing, nothing)
+    end
+end
+
+change = SimpleSDMResponse(𝑀, A)
+angle = SimpleSDMResponse(Θ, A)
+boundaries = SimpleSDMResponse(Boundaries(𝑀), A)
+
+#rate of change
+plot(
+    log(change);
+    frame=:box,
+    title="Rate of change",
+    dpi=400,
+    background_color = :transparent,
+    foreground_color = :black,
+)
+
+#direction of change
+CE, CS, CN, CW = colorant"#e3d96d", colorant"#714be3", colorant"#e35e40", colorant"#40e3a8"
+plot(angle; 
+    c=cgrad([CN, CE, CW, CS, CN], [0.0, 90.0, 180.0, 270.0, 360.0]), 
+    clim=(0, 360.0), 
+    dpi=400,
+    background_color = :transparent,
+    foreground_color = :black,)
+title!("Direction of Change")
+
+#candidate boundaries
+plot(rescale(boundaries, 
+    (0.0, 1.0)); 
+    dpi=400, c=:lapaz, 
+    legend=false,
+    background_color = :transparent,
+    foreground_color = :black)
+title!("Possible boundaries")
 
 # Example with lattice and bioclim data
 # This example is a little bit faster because it has a loop to avoid the squares with empty values
@@ -109,8 +158,6 @@ rescale!(A, (0.0, 1.0))
 plot(A,
 background_color = :transparent,
 foreground_color = :black,)
-
-png("figures/Isothermality")
 
 # Matrices for the strength and gradient
 𝑀 = convert(Matrix{Union{Float32,Nothing}}, zeros(Float32, size(A) .- 1))
@@ -176,7 +223,7 @@ plot(
 png("figures/Quantiles_RateofChange")
 
 # Example with lattice and NeutralLandscapes
-# which is ugly because I didnt feel like thinking
+# which is ugly because I didn't feel like thinking
 siz = 50, 50
 
 
