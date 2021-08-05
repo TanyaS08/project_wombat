@@ -312,40 +312,12 @@ for i in 1:size(𝑀, 1)
 
 end
 
-a = 𝑀[:, 1]
-b = partialsortperm(a, 1:10)
-collect(a[b])
-
-
-
 # A neutral landscape example
 
 siz = 50, 50
-A = Matrix(rand(PlanarGradient(), siz))
-
-"""
-    wombling(A::Matrix{T}) where {T<:Number}
-
-Wrapper function that implements the lattice wombling algorithm for points
-that are regualrly arranged in space.
-"""
-function wombling(A::Matrix{T}) where {T<:Number}
-    
-_M = convert(Matrix{Union{Float32}}, zeros(Float32, size(A) .- 1))
-_Θ = copy(_M)
-
-for j in 1:size(_M, 2), i in 1:size(_M, 1)
-    tmp = A[i:(i + 1), j:(j + 1)]
-    _M[i, j], _Θ[i, j] = _rateofchange(tmp)
-end
-
-    # Rate of change and direction
-    return (M = _M, Θ = _Θ)
-end
-
+A = Matrix(rand(EdgeGradient(), siz))
 womble = wombling(A)
 
-
 plot(
-    heatmap(A)
+    heatmap(womble.M)
     )
