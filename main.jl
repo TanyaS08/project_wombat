@@ -1,7 +1,7 @@
 import Pkg
 Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
 
-using Base: isgreater
+using Base
 using CSV: CSV
 using DataFrames
 using Delaunay
@@ -49,20 +49,20 @@ lons = sort(unique(n_species.longitude))
 Δlon = lons[2] - lons[1]
 G = fill(nothing, length(lats), length(lons))
 G = convert(Matrix{Union{Nothing,Int64}}, G)
-A = SimpleSDMResponse(
+#= A = SimpleSDMResponse(
     G,
     minimum(lons) - 0.5Δlon,
     maximum(lons) + 0.5Δlon,
     minimum(lats) - 0.5Δlat,
     maximum(lats) + 0.5Δlat,
-)
+)=#
 
 
 for site in eachrow(n_species)
-    A[site.longitude, site.latitude] = site.richness
+    G[site.longitude, site.latitude] = site.richness
 end
 
-A = convert(Float64, A)
+A = convert(Float64, G)
 
 # Make poits 'irregular' to test Delauney
 amph_points = Matrix(n_species[!, [:longitude, :latitude]])
@@ -315,3 +315,37 @@ end
 a = 𝑀[:, 1]
 b = partialsortperm(a, 1:10)
 collect(a[b])
+
+
+
+# A neutral landscape example
+
+siz = 50, 50
+A = Matrix(rand(PlanarGradient(), siz))
+
+"""
+    wombling(A::Matrix{T}) where {T<:Number}
+
+Wrapper function that implements the lattice wombling algorithm for points
+that are regualrly arranged in space.
+"""
+function wombling(A::Matrix{T}) where {T<:Number}
+    
+_M = convert(Matrix{Union{Float32}}, zeros(Float32, size(A) .- 1))
+_Θ = copy(_M)
+
+for j in 1:size(_M, 2), i in 1:size(_M, 1)
+    tmp = A[i:(i + 1), j:(j + 1)]
+    _M[i, j], _Θ[i, j] = _rateofchange(tmp)
+end
+
+    # Rate of change and direction
+    return (M = _M, Θ = _Θ)
+end
+
+womble = wombling(A)
+
+
+plot(
+    heatmap(A)
+    )
