@@ -4,7 +4,7 @@
 Wrapper function that implements the triangulation wombling algorithm for points
 that are irregularly arranged in space.
 """
-function wombling(x::Vector{T}, y::Vector{T}, z::Vector{T}) where {T<:Number}
+function wombling(x::Vector{Float64}, y::Vector{Float64}, z::Vector{Int64})
     
     length(x) >= 3  || throw(DimensionMismatch("x must have a minimum length of 3"))
     length(x) == length(y) || throw(DimensionMismatch("x and y must have the same dimension"))

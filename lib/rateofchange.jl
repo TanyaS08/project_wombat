@@ -24,14 +24,14 @@ Rate of change for a series of three points, defined as a series of `x` and `y`
 coordinates and a value `z`. Returns a rate of change (in units of `z`) and a
 gradient in degrees.
 """
-function _rateofchange(x::Vector{T}, y::Vector{T}, z::Vector{T}) where {T<:Number}
+function _rateofchange(x::Vector{Float64}, y::Vector{Float64}, z::Vector{Int64})
 
     # Check that all three vectors have the same length
     length(x) == length(y) || throw(DimensionMismatch("x and y must have the same length"))
     length(x) == length(z) || throw(DimensionMismatch("x and z must have the same length"))
 
     # Get the matrix of coefficients
-    C = cat(y, x, fill(one(T), length(x)); dims=(2, 2))
+    C = cat(y, x, fill(one(Float64), length(x)); dims=(2, 2))
     coeff = Base.inv(C) * z
 
     X = sum(C[:, 1]) / 3.0
