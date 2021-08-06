@@ -316,8 +316,20 @@ end
 
 siz = 50, 50
 A = Matrix(rand(EdgeGradient(), siz))
+plot(
+    heatmap(A)
+    )
 womble = wombling(A)
 
 plot(
     heatmap(womble.M)
     )
+
+plot(
+    heatmap(boundaries(womble.M))
+    )
+
+boundary = boundaries(womble.M)
+
+limit = floor(Int, size(womble.M, 2) * size(womble.M, 1) * 0.1)
+    M_n = denserank(womble.M, rev=true) 
