@@ -65,7 +65,7 @@ end
 A = convert(Float64, G)
 
 # Make poits 'irregular' to test Delauney
-amph_points = Matrix(n_species[!, [:longitude, :latitude]])
+amph_points = Matrix(n_species[!, [:Long, :Lat]])
 mesh = delaunay(amph_points)
 
 x = amph_points[:, 1]
@@ -73,9 +73,23 @@ y = amph_points[:, 2]
 z = n_species.richness
 
 # womble!
-df = Wombling(x, y, z)
+df = wombling(x, y, z)
 
-# wombled triangles (with roate of change) with candidate boundaries
+df.M
+
+b_df = boundaries(df.M, df.x, df.y)
+b_df.B
+
+v = hcat(denserank(df.M, rev = true),df.M, df.x, df.y); 
+sort!(v, dims = 1, by = x -> x[1])
+limit = floor(Int, length(df.M) * threshold)
+v[(v[:,1] .< limit),:]
+
+
+
+denserank(df.M, rev = true)
+
+# wombled triangles (with rate of change) with candidate boundaries
 plot()
 for i in 1:size(mesh.simplices, 1)
     c = amph_points[mesh.simplices[i, :], :]
