@@ -47,10 +47,12 @@ Plot the landscape so we have an _a priori_ idea
 of what if looks like
 
 ````julia
-plot(
-    heatmap(A)
-    )
+plot(heatmap(A))
+
+savefig("assets/PlanarLandscape.png")
 ````
+
+![](assets/PlanarLandscape.png){#fig:landscape}
 
 Calculate the rate of change (𝑀) and direction of
 change (θ) using `wombling()`
@@ -62,7 +64,11 @@ plot(
     plot(heatmap(womble.M), title = "Rate of Change"),
     plot(heatmap(womble.Θ), title = "Direction of Change")
     )
+
+savefig("assets/PlanarWomble.png")
 ````
+
+![](assets/PlanarWomble.png){#fig:womble}
 
 We can extract the candidate boundaries using the
 rate of change caluclated from `wombling()`
@@ -74,5 +80,9 @@ plot(
     heatmap(boundary),
     title = "Candidate boundaries"
 )
+
+savefig("assets/PlanarBoundaries.png")
 ````
+
+![](assets/PlanarBoundaries.png){#fig:womble}
 
