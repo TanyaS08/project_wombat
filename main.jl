@@ -1,6 +1,6 @@
 # # README
 
-# ![](assets/header.png){#fig:head}
+# ![](assets/header.png)
 
 import Pkg
 Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
@@ -47,7 +47,7 @@ plot(heatmap(A))
 
 savefig("assets/PlanarLandscape.png")
 
-# ![](assets/PlanarLandscape.png){#fig:landscape}
+# ![](assets/PlanarLandscape.png)
 
 # Calculate the rate of change (𝑀) and direction of 
 # change (θ) using `wombling()`
@@ -62,7 +62,7 @@ plot(
 
 savefig("assets/PlanarWomble.png")
 
-# ![](assets/PlanarWomble.png){#fig:womble}
+# ![](assets/PlanarWomble.png)
 
 # We can extract the candidate boundaries using the 
 # rate of change caluclated from `wombling()`
@@ -76,4 +76,4 @@ plot(
 
 savefig("assets/PlanarBoundaries.png")
 
-# ![](assets/PlanarBoundaries.png){#fig:womble}
+# ![](assets/PlanarBoundaries.png)
