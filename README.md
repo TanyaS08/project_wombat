@@ -33,41 +33,41 @@ include(joinpath(pwd(), "lib", "wombling.jl"))
 
 # A Neutral landscapes example for lattice wombling
 
-````julia
-#=
 First we create a 50 x 50 'cell' landscape. In this
 instance a planar landscape is it has a 'distinct'/sharp
 boundary
-=#
 
+````julia
 using NeutralLandscapes
 siz = 50, 50
 A = Matrix(rand(EdgeGradient(), siz))
+````
 
-#= Plot the landscape so we have an _a priori_ idea
-of what if looks like =#
+Plot the landscape so we have an _a priori_ idea
+of what if looks like
 
+````julia
 plot(
     heatmap(A)
     )
+````
 
-#=
-Calucalte the rate of change (𝑀) and direction of
+Calculate the rate of change (𝑀) and direction of
 change (θ) using `wombling()`
- =#
 
+````julia
 womble = wombling(A)
 
 plot(
     plot(heatmap(womble.M), title = "Rate of Change"),
     plot(heatmap(womble.Θ), title = "Direction of Change")
     )
+````
 
-#=
 We can extract the candidate boundaries using the
 rate of change caluclated from `wombling()`
- =#
 
+````julia
 boundary = boundaries(womble.M)
 
 plot(
