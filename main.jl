@@ -1,3 +1,7 @@
+# # README
+
+# ![](assets/header.png){#fig:head}
+
 import Pkg
 Pkg.activate("/Users/tanyastrydom/Documents/Uni/project_wombat")
 
@@ -26,7 +30,7 @@ include(joinpath(pwd(), "lib", "rateofchange.jl"))
 include(joinpath(pwd(), "lib", "boundary.jl"))
 include(joinpath(pwd(), "lib", "wombling.jl"))
 
-# # A Neutral landscapes example for lattice wombling
+# ## A Neutral landscapes example for lattice wombling
 
 # First we create a 50 x 50 'cell' landscape. In this
 # instance a planar landscape is it has a 'distinct'/sharp
